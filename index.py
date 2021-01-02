@@ -45,7 +45,30 @@ app.layout = html.Div([ titleMd,
     value=0.2
                                   ),
                        dash_table.DataTable(id='adjusted-table',
-                       style_cell={'textAlign': 'left'})
+                       style_cell={'textAlign': 'left'},
+                       style_data_conditional=[
+                           {
+                            'if': {
+                                'filter_query': '{Point Diff} < 0',
+                                'column_id': 'Point Diff'
+                                  },
+                            'backgroundColor': 'tomato',
+                            'color': 'white'
+                            },
+                            {
+                            'if': {
+                                'filter_query': '{Point Diff} > 0',
+                                'column_id': 'Point Diff'
+                                  },
+                            'backgroundColor': 'green',
+                            'color': 'white'
+                            }
+                           ],
+                       style_header={
+                           'backgroundColor': 'rgb(230, 230, 230)',
+                           'fontWeight': 'bold'
+                           }
+                       )
     ])
 @app.callback(
     Output('adjusted-table','columns'),
@@ -62,6 +85,12 @@ def update_table(tolerance):
     matchesDict = matches.to_dict('records')
     otherTable = pd.DataFrame(columns=['Club','xG Won','xG Draw','xG Loss','xG For','xG Against','xG Points','nsxG For','nsxG Against','nsxG Won','nsxG Draw','nsxG Loss','nsxG Points'])
     otherTable['Club'] = clubnames
+    otherTable['GScored'] = 0
+    otherTable['GConceded'] = 0
+    otherTable['GD'] = 0
+    otherTable['Won'] = 0
+    otherTable['Draw'] = 0
+    otherTable['Lost'] = 0
     otherTable['xG Won'] = 0
     otherTable['xG Draw'] = 0
     otherTable['xG Loss'] = 0
@@ -101,15 +130,24 @@ def update_table(tolerance):
         if not (math.isnan(match['nsxg1']) & math.isnan(match['nsxg2'])):
             otherTable.loc[otherTable['Club']==match['team1'],'Matches'] += 1
             otherTable.loc[otherTable['Club']==match['team2'],'Matches'] += 1
+            otherTable.loc[otherTable['Club']==match['team1'],'GScored'] += match['score1']
+            otherTable.loc[otherTable['Club']==match['team2'],'GConceded'] += match['score2']
             if match['score1']>match['score2']:
                 otherTable.loc[otherTable['Club']==match['team1'],'Actual Points'] += 3
+                otherTable.loc[otherTable['Club']==match['team1'],'Won'] += 1
+                otherTable.loc[otherTable['Club']==match['team2'],'Lost'] += 1
                 match['result'] = 'team1'
             elif match['score1']<match['score2']:
                 otherTable.loc[otherTable['Club']==match['team2'],'Actual Points'] += 3
+                otherTable.loc[otherTable['Club']==match['team2'],'Won'] += 1
+                otherTable.loc[otherTable['Club']==match['team1'],'Lost'] += 1
+                
                 match['result'] = 'team2'
             else:
                 otherTable.loc[otherTable['Club']==match['team1'],'Actual Points'] += 1
                 otherTable.loc[otherTable['Club']==match['team2'],'Actual Points'] += 1
+                otherTable.loc[otherTable['Club']==match['team1'],'Draw'] += 1
+                otherTable.loc[otherTable['Club']==match['team2'],'Draw'] += 1
                 match['result'] = 'draw'
             adjScoreDiff = match['nsxg1']-match['nsxg2']
             if adjScoreDiff>=0.25:
@@ -161,12 +199,19 @@ def update_table(tolerance):
     otherTable.loc[:,'xG Points'] = (otherTable.loc[:,'xG Won']*3) + (otherTable.loc[:,'xG Draw']*1)
     otherTable.loc[:,'nsxG Points'] = (otherTable.loc[:,'nsxG Won']*3) + (otherTable.loc[:,'nsxG Draw']*1)
     otherTable.loc[:,'avg Score Points'] = (otherTable.loc[:,'avg Score Won']*3) + (otherTable.loc[:,'avg Score Draw']*1)
+    otherTable.loc[:,'Point Diff'] = otherTable.loc[:,'Actual Points']-otherTable.loc[:,'avg Score Points']
+    otherTable.loc[:,'GD'] = otherTable.loc[:,'GScored']-otherTable.loc[:,'GConceded']
+    otherTable.sort_values(by=['Actual Points','GD','GScored'],ascending=False,inplace=True)
+    origpositions = range(1,21)
+    otherTable.loc[:,'Original Position'] = origpositions
     otherTable.sort_values(by=['avg Score Points','avg Score For'],ascending=False,inplace=True)
+    avgscorepos = range(1,21)
+    otherTable.loc[:,'Avg Score Position'] = avgscorepos
     matchesUpdated = pd.DataFrame.from_dict(matchesDictUpdated)
-    columnlist = ['Club','Matches','Actual Points','avg Score Points','avg Score Won','avg Score Draw','avg Score Loss']
+    columnlist = ['Avg Score Position','Original Position','Club','Matches','Actual Points','avg Score Points','Point Diff','avg Score Won','avg Score Draw','avg Score Loss']
     data = otherTable.to_dict('records')
-    columnnames = ['Club','Matches','Original Points','Average Score Points','Average Score Won',
-                   'Average Score Draw','Average Score Losses']
+    columnnames = ['Avg Score Position','Original Position','Club','Matches','Original Points','Avg Score Points','Point Difference','Avg Score Won',
+                   'Avg Score Draw','Avg Score Losses']
     columns = [{'name':columnnames[count],'id':i} for count,i in enumerate(columnlist)]
     return(columns,data)
 if __name__ == '__main__':
