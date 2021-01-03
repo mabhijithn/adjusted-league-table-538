@@ -16,6 +16,8 @@ import dash_table
 from dash.dependencies import Input, Output
 from helperfns import buildadjustedtable
 
+leagueNames = ['Barclays Premier League','Spanish Primera Division','German Bundesliga',
+               'Italy Serie A','Scottish Premiership','French Ligue 1']
 titleMd = dcc.Markdown(''' ## Adjusted English Premier League Table''')
 description = dcc.Markdown('''### Using [FiveThirtyEight's](https://projects.fivethirtyeight.com/soccer-predictions/) xG, non-shot xG and adjusted score metrics
                            
@@ -50,6 +52,13 @@ app.layout = html.Div([ titleMd,
     },
     value=0.2
                                   ),
+                       html.Br(),
+                       dcc.Markdown('''#### Select League:
+                                    '''),
+                       dcc.Dropdown(id='league-dropdown',
+                                    options=[{'label':i,'value':i} for i in leagueNames],
+                                    value='Barclays Premier League'),
+                       html.Br(),
                        dash_table.DataTable(id='adjusted-table',
                        style_cell={'textAlign': 'left'},
                        style_data_conditional=[
@@ -83,10 +92,11 @@ app.layout = html.Div([ titleMd,
 @app.callback(
     Output('adjusted-table','columns'),
     Output('adjusted-table','data'),
-    Input('tolerance-selection','value')
+    Input('tolerance-selection','value'),
+    Input('league-dropdown','value')
     )
-def update_table(tolerance):
-    leagueName = 'Barclays Premier League'
+def update_table(tolerance,leagueName):
+    #leagueName = 'Barclays Premier League'
     otherTable = buildadjustedtable(leagueName,tolerance)
     
     columnlist = ['Avg Score Position','Original Position','Club','Matches','Actual Points','avg Score Points','Point Diff','avg Score Won','avg Score Draw','avg Score Loss']

@@ -135,9 +135,9 @@ def buildadjustedtable(leagueName,tolerance):
     otherTable.loc[:,'Point Diff'] = otherTable.loc[:,'Actual Points']-otherTable.loc[:,'avg Score Points']
     otherTable.loc[:,'GD'] = otherTable.loc[:,'GScored']-otherTable.loc[:,'GConceded']
     otherTable.sort_values(by=['Actual Points','GD','GScored'],ascending=False,inplace=True)
-    origpositions = range(1,21)
+    origpositions = range(1,len(clubnames)+1)
     otherTable.loc[:,'Original Position'] = origpositions
     otherTable.sort_values(by=['avg Score Points','avg Score For'],ascending=False,inplace=True)
-    avgscorepos = range(1,21)
+    avgscorepos = range(1,len(clubnames)+1)
     otherTable.loc[:,'Avg Score Position'] = avgscorepos
     return otherTable
