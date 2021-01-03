@@ -16,7 +16,7 @@ import dash_table
 from dash.dependencies import Input, Output
 
 titleMd = dcc.Markdown(''' ## Adjusted English Premier League Table''')
-description = dcc.Markdown('''### Using @FiveThirtyEight's xG, non-shot xG and adjusted score metrics
+description = dcc.Markdown('''### Using [FiveThirtyEight's](https://projects.fivethirtyeight.com/soccer-predictions/) xG, non-shot xG and adjusted score metrics
                            
 ##### **Disclaimer:** The data shown here is for personal consumption. Please leave feedback replying to my twitter profile [@Ituralde](https://twitter.com/Ituralde) and give a follow once you are there :-) 
                            ''')
