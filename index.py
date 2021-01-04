@@ -17,7 +17,7 @@ from dash.dependencies import Input, Output
 from helperfns import buildadjustedtable
 
 leagueNames = ['Barclays Premier League','Spanish Primera Division','German Bundesliga',
-               'Italy Serie A','Scottish Premiership','French Ligue 1']
+               'Italy Serie A','French Ligue 1']
 titleMd = dcc.Markdown(''' ## Adjusted English Premier League Table''')
 description = dcc.Markdown('''### Using [FiveThirtyEight's](https://projects.fivethirtyeight.com/soccer-predictions/) xG, non-shot xG and adjusted score metrics
                            
