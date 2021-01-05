@@ -10,6 +10,7 @@ from app import app
 from app import server
 import pandas as pd
 import math
+import dash
 import dash_html_components as html
 import dash_core_components as dcc
 import dash_table
@@ -54,10 +55,14 @@ app.layout = html.Div([ titleMd,
                                   ),
                        html.Br(),
                        dcc.Markdown('''#### Select League:
-                                    '''),
+                                    '''),                       
                        dcc.Dropdown(id='league-dropdown',
                                     options=[{'label':i,'value':i} for i in leagueNames],
                                     value='Barclays Premier League'),
+                       html.Br(),
+                       html.Tr([
+                       html.Button('Generate Table','gen-table-button')
+                       ]),
                        html.Br(),
                        dash_table.DataTable(id='adjusted-table',
                        style_cell={'textAlign': 'left'},
@@ -79,7 +84,7 @@ app.layout = html.Div([ titleMd,
                                 'filter_query': '{Point Diff} > 0',
                                 'column_id': 'Point Diff'
                                   },
-                            'backgroundColor': 'green',
+                            'backgroundColor': 'green', 
                             'color': 'black'
                             },
                            ],
@@ -93,17 +98,21 @@ app.layout = html.Div([ titleMd,
     Output('adjusted-table','columns'),
     Output('adjusted-table','data'),
     Input('tolerance-selection','value'),
-    Input('league-dropdown','value')
+    Input('league-dropdown','value'),
+    Input('gen-table-button','n_clicks')
     )
-def update_table(tolerance,leagueName):
+def update_table(tolerance,leagueName, n_clicks):
     #leagueName = 'Barclays Premier League'
-    otherTable = buildadjustedtable(leagueName,tolerance)
-    
-    columnlist = ['Avg Score Position','Original Position','Club','Matches','Actual Points','avg Score Points','Point Diff','avg Score Won','avg Score Draw','avg Score Loss']
-    data = otherTable.to_dict('records')
+    change_id = [p['prop_id'] for p in dash.callback_context.triggered][0]
     columnnames = ['Avg Score Position','Original Position','Club','Matches','Original Points','Avg Score Points','Point Difference','Avg Score Won',
                    'Avg Score Draw','Avg Score Losses']
+    columnlist = ['Avg Score Position','Original Position','Club','Matches','Actual Points','avg Score Points','Point Diff','avg Score Won','avg Score Draw','avg Score Loss']                
     columns = [{'name':columnnames[count],'id':i} for count,i in enumerate(columnlist)]
+    if 'gen-table-button' in change_id:
+        otherTable = buildadjustedtable(leagueName,tolerance)            
+    else:
+        otherTable = pd.DataFrame(columns=columnlist)
+    data = otherTable.to_dict('records')
     return(columns,data)
 if __name__ == '__main__':
     app.run_server(debug=True,port=1234)
