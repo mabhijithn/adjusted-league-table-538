@@ -90,7 +90,9 @@ app.layout = html.Div([ titleMd,
                            ],
                        style_header={
                            'backgroundColor': 'rgb(230, 230, 230)',
-                           'fontWeight': 'bold'
+                           'fontWeight': 'bold',
+                           'whiteSpace': 'normal',
+                           'height': 'auto',
                            }
                        )
     ])
@@ -104,14 +106,21 @@ app.layout = html.Div([ titleMd,
 def update_table(tolerance,leagueName, n_clicks):
     #leagueName = 'Barclays Premier League'
     change_id = [p['prop_id'] for p in dash.callback_context.triggered][0]
-    columnnames = ['Avg Score Position','Original Position','Club','Matches','Original Points','Avg Score Points','Point Difference','Avg Score Won',
-                   'Avg Score Draw','Avg Score Losses']
-    columnlist = ['Avg Score Position','Original Position','Club','Matches','Actual Points','avg Score Points','Point Diff','avg Score Won','avg Score Draw','avg Score Loss']                
+    columnnames = ['Avg Score Position','Original Position','Club','Matches','Original Points','Avg Score Points','Point Difference',
+                   'Avg Goals Scored','xG Scored','Actual Goals Scored',
+                   'Avg Goals Conceded','xG Conceded','Actual Goals Conceded']
+    columnlist = ['Avg Score Position','Original Position','Club','Matches','Actual Points','avg Score Points','Point Diff',
+                  'avg Score For','xG For','GScored','avg Score Against','xG Against','GConceded']                
     columns = [{'name':columnnames[count],'id':i} for count,i in enumerate(columnlist)]
     if 'gen-table-button' in change_id:
         otherTable = buildadjustedtable(leagueName,tolerance)            
     else:
         otherTable = pd.DataFrame(columns=columnlist)
+    
+    goalsColumns = ['avg Score For','xG For','GScored','avg Score Against',
+                    'xG Against','GConceded']
+    for g in goalsColumns:
+        otherTable.loc[:,g] = otherTable.loc[:,g].round(1)
     data = otherTable.to_dict('records')
     return(columns,data)
 if __name__ == '__main__':

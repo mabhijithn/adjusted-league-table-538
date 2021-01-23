@@ -49,18 +49,18 @@ def buildadjustedtable(leagueName,tolerance):
     matchesDictUpdated = []
     
     for match in matchesDict:
-        if not (math.isnan(match['xg1']) & math.isnan(match['xg2'])):
+        if not (math.isnan(match['nsxg1']) & math.isnan(match['nsxg2'])):
             xGdiff = match['xg1']-match['xg2']
-            if xGdiff>=0.25:
+            if xGdiff>=tolerance:
                 otherTable.loc[otherTable['Club']==match['team1'],'xG Won'] += 1
                 otherTable.loc[otherTable['Club']==match['team2'],'xG Loss'] += 1
-            elif (xGdiff<0.25) & (xGdiff>-0.25):
+            elif (xGdiff<tolerance) & (xGdiff>(-1*tolerance)):
                 otherTable.loc[otherTable['Club']==match['team1'],'xG Draw'] += 1
                 otherTable.loc[otherTable['Club']==match['team2'],'xG Draw'] += 1
             else:
                 otherTable.loc[otherTable['Club']==match['team2'],'xG Won'] += 1
                 otherTable.loc[otherTable['Club']==match['team1'],'xG Loss'] += 1
-        if not (math.isnan(match['nsxg1']) & math.isnan(match['nsxg2'])):
+            
             otherTable.loc[otherTable['Club']==match['team1'],'Matches'] += 1
             otherTable.loc[otherTable['Club']==match['team2'],'Matches'] += 1
             otherTable.loc[otherTable['Club']==match['team1'],'GScored'] += match['score1']
@@ -83,11 +83,11 @@ def buildadjustedtable(leagueName,tolerance):
                 otherTable.loc[otherTable['Club']==match['team2'],'Draw'] += 1
                 match['result'] = 'draw'
             adjScoreDiff = match['nsxg1']-match['nsxg2']
-            if adjScoreDiff>=0.25:
+            if adjScoreDiff>=tolerance:
                 otherTable.loc[otherTable['Club']==match['team1'],'nsxG Won'] += 1
                 otherTable.loc[otherTable['Club']==match['team2'],'nsxG Loss'] += 1
                 
-            elif (adjScoreDiff<0.25) & (adjScoreDiff>-0.25):
+            elif (adjScoreDiff<tolerance) & (adjScoreDiff>(-1*tolerance)):
                 otherTable.loc[otherTable['Club']==match['team1'],'nsxG Draw'] += 1
                 otherTable.loc[otherTable['Club']==match['team2'],'nsxG Draw'] += 1
                 
