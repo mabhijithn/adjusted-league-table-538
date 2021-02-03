@@ -64,7 +64,9 @@ def buildadjustedtable(leagueName,tolerance):
             otherTable.loc[otherTable['Club']==match['team1'],'Matches'] += 1
             otherTable.loc[otherTable['Club']==match['team2'],'Matches'] += 1
             otherTable.loc[otherTable['Club']==match['team1'],'GScored'] += match['score1']
-            otherTable.loc[otherTable['Club']==match['team2'],'GConceded'] += match['score2']
+            otherTable.loc[otherTable['Club']==match['team2'],'GScored'] += match['score2']
+            otherTable.loc[otherTable['Club']==match['team1'],'GConceded'] += match['score2']
+            otherTable.loc[otherTable['Club']==match['team2'],'GConceded'] += match['score1']
             if match['score1']>match['score2']:
                 otherTable.loc[otherTable['Club']==match['team1'],'Actual Points'] += 3
                 otherTable.loc[otherTable['Club']==match['team1'],'Won'] += 1
