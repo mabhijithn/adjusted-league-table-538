@@ -12,7 +12,7 @@ def buildadjustedtable(leagueName,tolerance):
     soccermatchesurl = 'https://projects.fivethirtyeight.com/soccer-api/club/spi_matches_latest.csv'
     soccerspi = pd.read_csv(soccermatchesurl)
     eplName = leagueName
-    season = 2020
+    season = 2022
     matches = soccerspi.loc[(soccerspi['league']==eplName) & (soccerspi['season']==season),:]
     clubnames = list(matches['team1'].unique())
     matchesDict = matches.to_dict('records')
