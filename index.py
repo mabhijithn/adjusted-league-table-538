@@ -11,9 +11,7 @@ from app import server
 import pandas as pd
 import math
 import dash
-import dash_html_components as html
-import dash_core_components as dcc
-import dash_table
+from dash import dcc, html, dash_table
 from dash.dependencies import Input, Output
 from helperfns import buildadjustedtable
 
@@ -143,4 +141,4 @@ def update_table(tolerance,leagueName, n_clicks):
     data = otherTable.to_dict('records')
     return(columns,data)
 if __name__ == '__main__':
-    app.run_server(debug=True,port=1234)
+    app.run_server(debug=True,host="0.0.0.0",port=5000)
