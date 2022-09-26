@@ -9,7 +9,8 @@ WORKDIR /webapp
 
 ENV PIP_NO_CACHE_DIR=1
 
-RUN pip install -r requirements.txt
+RUN pip install --upgrade pip &&\ 
+        pip install -r requirements.txt
 
 CMD [ "python","index.py" ]
 EXPOSE 5000
